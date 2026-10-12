@@ -1,0 +1,95 @@
+# Customer account UI extension: custom return reasons
+#
+# IMPORTANT: when you scaffold the extension with Shopify CLI it writes a `uid`
+# line into this file. Keep that generated line and copy the rest from here.
+
+api_version = "2026-07"
+
+[[extensions]]
+type = "ui_extension"
+name = "Custom return reasons"
+handle = "custom-return-reasons"
+uid = "5794e790-15ae-c661-316d-8626945f898ef2b5c33c"
+
+  # The "Request a return" button on the Orders list and Order status pages
+  [[extensions.targeting]]
+  target = "customer-account.order.action.menu-item.render"
+  module = "./src/RequestReturnButton.jsx"
+
+  # The pop-up that opens when the button is clicked
+  [[extensions.targeting]]
+  target = "customer-account.order.action.render"
+  module = "./src/RequestReturnModal.jsx"
+
+# Lets the extension read product tags (Storefront API) for the final-sale check
+[extensions.capabilities]
+api_access = true
+
+# Return reasons the merchant can edit in Shopify admin >
+# Settings > Customer accounts > Customize. Empty boxes are skipped.
+# If every box is empty, the defaults in src/reasons.js are used.
+[extensions.settings]
+  [[extensions.settings.fields]]
+  key = "return_window_days"
+  type = "number_integer"
+  name = "Return window (days)"
+  description = "Days after delivery (or fulfillment, if there's no tracking) that customers can request a return. Empty = 30."
+
+  [[extensions.settings.fields]]
+  key = "final_sale_tag"
+  type = "single_line_text_field"
+  name = "Final-sale tag"
+  description = "Products with this tag can't be returned. Empty = final-sale."
+
+  [[extensions.settings.fields]]
+  key = "return_fees_note"
+  type = "multi_line_text_field"
+  name = "Return fees note"
+  description = "Shown in the pop-up, e.g. Return shipping: $5. Leave empty to hide."
+
+  [[extensions.settings.fields]]
+  key = "hide_refund_estimate"
+  type = "boolean"
+  name = "Hide refund estimate"
+  description = "Choose True to hide the estimated refund from customers."
+
+  [[extensions.settings.fields]]
+  key = "reason_1"
+  type = "single_line_text_field"
+  name = "Reason 1"
+  description = "Shown in the return reason dropdown. Leave empty to hide."
+
+  [[extensions.settings.fields]]
+  key = "reason_2"
+  type = "single_line_text_field"
+  name = "Reason 2"
+
+  [[extensions.settings.fields]]
+  key = "reason_3"
+  type = "single_line_text_field"
+  name = "Reason 3"
+
+  [[extensions.settings.fields]]
+  key = "reason_4"
+  type = "single_line_text_field"
+  name = "Reason 4"
+
+  [[extensions.settings.fields]]
+  key = "reason_5"
+  type = "single_line_text_field"
+  name = "Reason 5"
+
+  [[extensions.settings.fields]]
+  key = "reason_6"
+  type = "single_line_text_field"
+  name = "Reason 6"
+
+  [[extensions.settings.fields]]
+  key = "reason_7"
+  type = "single_line_text_field"
+  name = "Reason 7"
+
+  [[extensions.settings.fields]]
+  key = "reason_8"
+  type = "single_line_text_field"
+  name = "Reason 8"

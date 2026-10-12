@@ -1,0 +1,29 @@
+import '@shopify/ui-extensions';
+
+//@ts-ignore
+declare module './src/RequestReturnButton.jsx' {
+  const shopify: import('@shopify/ui-extensions/customer-account.order.action.menu-item.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/RequestReturnModal.jsx' {
+  const shopify: import('@shopify/ui-extensions/customer-account.order.action.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/api.js' {
+  const shopify:
+    | import('@shopify/ui-extensions/customer-account.order.action.menu-item.render').Api
+    | import('@shopify/ui-extensions/customer-account.order.action.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
+
+//@ts-ignore
+declare module './src/reasons.js' {
+  const shopify:
+    | import('@shopify/ui-extensions/customer-account.order.action.menu-item.render').Api
+    | import('@shopify/ui-extensions/customer-account.order.action.render').Api;
+  const globalThis: { shopify: typeof shopify };
+}
