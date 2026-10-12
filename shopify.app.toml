@@ -1,9 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-name = "npm-builder"
+name = "custom-return-reasons"
 application_url = "https://shopify.dev/apps/default-app-home"
 embedded = true
-client_id = "f54aec77baf81c08e22eb3e4dcbfd8ab"
 
 [build]
 include_config_on_deploy = true

@@ -9,7 +9,6 @@ api_version = "2026-07"
 type = "ui_extension"
 name = "Custom return reasons"
 handle = "custom-return-reasons"
-uid = "5794e790-15ae-c661-316d-8626945f898ef2b5c33c"
 
   # The "Request a return" button on the Orders list and Order status pages
   [[extensions.targeting]]

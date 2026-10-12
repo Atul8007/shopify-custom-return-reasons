@@ -25,7 +25,7 @@ When a release series is no longer supported, it's your own responsibility to de
 ## Reporting a bug
 
 All security bugs in shopify repositories should be reported to [our hackerone program](https://hackerone.com/shopify)
-Shopify's whitehat program is our way to reward security researchers for finding serious security vulnerabilities in the In Scope properties listed at the bottom of this page, including our core application (all functionality associated with a Shopify store, particularly your-store.myshopify.com/admin) and certain ancillary applications.
+Shopify's whitehat program is our way to reward security researchers for finding serious security vulnerabilities in the In Scope properties listed at the bottom of this page, including our core application (all functionality associated with a Shopify store admin) and certain ancillary applications.
 
 ## Disclosure Policy
 

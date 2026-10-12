@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, feature/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-and-build:
+    name: Validate, Check Secrets & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Run Secret and Identity Leak Check
+        run: node scripts/check-secrets.mjs
+
+      - name: Install root dependencies
+        run: npm ci || npm install
+
+      - name: Install extension dependencies
+        run: |
+          npm --prefix extensions/app-home install
+          npm --prefix extensions/custom-return-reasons install
+
+      - name: Build extensions
+        run: npm run build

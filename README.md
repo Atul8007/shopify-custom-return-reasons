@@ -1,154 +1,109 @@
-# Custom return reasons for Shopify customer accounts
+# Custom Return Reasons (Shopify App Template)
 
-Adds a **"Request a return"** button to each order in your customer accounts.
-It opens a pop-up with **your own reasons** in the dropdown. The request is saved
-**on the order** (reason + item details); you then create the return in Shopify
-admin yourself. Shopify's self-serve returns stay **off**, so customers see only
-this one button.
-
-Files you will edit most:
-- `extensions/custom-return-reasons/src/reasons.js`: default reasons and all on-screen text
+> **Free, open-source, zero-backend return management for Shopify.**  
+> Ask customers *why* they are returning an item, save custom reasons directly to native Order Metafields, and build native **Shopify Analytics** return reports without third-party monthly subscriptions.
 
 ---
 
-## What you need (one time)
+## What It Does
+- **Seamless Customer Experience**: Adds a native "Request a return" action to New Customer Accounts on eligible orders (paid, delivered/fulfilled within your return window, excluding final-sale products).
+- **Customizable Return Reasons**: Configure up to 8 custom reasons in Shopify Admin theme customize editor without code.
+- **Native Shopify Metafields**: Automatically records requests to native order metafields:
+  - `custom.return_reason`: Main reason for order filtering and Shopify Analytics reports.
+  - `custom.return_request` / `$app:return_request`: Human-readable history for staff.
+  - `custom.return_status` / `$app:return_status`: Review status (`Pending`, `Approved`, `Declined`, `Refunded`).
+- **Zero Backend**: 100% serverless, Preact UI extensions, and direct API access. No hosting, no database, no privacy leaks.
 
-1. **Node.js 20+**: https://nodejs.org
-2. **Shopify CLI**: in a terminal run `npm install -g @shopify/cli@latest`
-3. **A free Shopify Partner / Dev Dashboard account**: https://www.shopify.com/partners
-4. A **development store** to test on (create one from the Dev Dashboard).
-   Turn on new customer accounts in it and place a test order.
+---
 
-## Setup
+## Requirements
+- **Node.js**: v20 or newer
+- **Shopify CLI**: Latest (`npm install -g @shopify/cli`)
+- **Shopify Partner Account** and a development or live store with **New Customer Accounts** enabled.
 
-### 1. Create an empty app
+---
 
+## Installation
+
+### 1. Initialize from Template
+Create a new project using the Shopify CLI template flag:
 ```bash
-shopify app init
+shopify app init --template https://github.com/<your-username>/custom-return-reasons
 ```
-- Name it e.g. `custom-return-reasons`
-- When asked for a template, choose **"Build an extension-only app"**
+*(Or clone this repository directly and run `npm install`)*
 
-### 2. Add a customer account extension
-
+### 2. Deploy the App
+Link and deploy the extensions to your app:
 ```bash
 cd custom-return-reasons
-shopify app generate extension --template customer_account_ui --name custom-return-reasons
-```
-Pick **JavaScript (Preact)** if asked. If it fails with `'pnpm' is not recognized`,
-run `npm install -g pnpm` and `pnpm install`; the extension folder is usually created anyway.
-
-### 3. Drop in these files
-
-Copy from this folder into `extensions/custom-return-reasons/`:
-
-| From this folder | Do this |
-|---|---|
-| `src/reasons.js`, `src/api.js`, `src/RequestReturnButton.jsx`, `src/RequestReturnModal.jsx` | Copy into `src/`. Delete the sample file the CLI created there. |
-| `shopify.extension.toml` | Replace the generated one, **but keep the `uid = "..."` line the CLI wrote**. |
-
-### 4. Add the access scopes
-
-Open `shopify.app.toml` in the app's root folder and set:
-
-```toml
-[access_scopes]
-scopes = "customer_read_customers,customer_read_orders,customer_write_orders,customer_write_customers"
-```
-(Needed to read orders and to save the request on the order.)
-
-### 5. Deploy and install
-
-```bash
 shopify app deploy
 ```
-Then install the app on the store (Dev Dashboard > your app > Distribution
-> **Custom distribution** > enter your store domain > open the install link).
-In Dev Dashboard > your app > API access, fill in **Protected customer data**.
-Real (non-development) stores need Shopify's approval of it before the button works.
-
-### 6. Create the four order fields (once per store)
-
-Shopify admin > **Settings > Custom data > Orders > Add definition**, four times.
-All four need **Customer Account API access: Read and write**.
-
-| Name | Namespace and key | Type | Extra options |
-|---|---|---|---|
-| Return reason | `custom.return_reason` | Single line text | **Filter or group data in Analytics** on; **Filter on the order list** on |
-| Return request | `custom.return_request` | Multi-line text | (none) |
-| Return data | `custom.return_data` | JSON | (none). The app's own record; don't edit it. |
-| Return status | `custom.return_status` | Single line text, **Limit to preset choices**: `Pending`, `Approved`, `Declined`, `Refunded` | (none) |
-
-Without them, customers get an error when they submit.
-Shopify allows only **5** order fields with "Filter on the order list" on; if the
-store already uses all 5, turn one off first.
-
-### 7. Store settings
-
-1. **Settings > Customer accounts** > turn **Self-serve returns and cancellations off**.
-   This hides Shopify's own "Return items" button. The app checks eligibility itself.
-2. **Settings > Customer accounts > Customize** > **Order status** page > **Apps** >
-   **Custom return reasons** > add it to "Orders and Order status" > **Save**.
-   Until you do this, the store doesn't load the extension at all.
-3. In the same place, optionally set:
-   - **Return window (days)**: days after delivery (or fulfillment, when there's no
-     tracking) that items can be returned (empty = 30)
-   - **Final-sale tag**: products with this tag are never offered for return
-     (empty = `final-sale`). Add the tag to those products in Products.
-   - **Return fees note**: text shown in the pop-up, e.g. "Return shipping: $5"
-   - **Hide refund estimate**: tick to stop showing the estimated refund
-   - **Reason 1–8**: your reasons. Empty boxes are hidden; if all are empty, the
-     defaults in `src/reasons.js` are shown.
-
-### 8. Analytics report
-
-Analytics > Reports > new report. Start with an **orders metric (Orders)**, then add
-the **Return reason** dimension. If you start from "Returned quantity", Shopify won't
-offer the field. Save it (e.g. "Orders by return reason"). It counts orders, not items.
-
-Return reason always holds **one** reason: the main one (most units) from the
-customer's latest request. Filters and reports only match whole values, so a
-combined value would match nothing. Every item's reason is still in Return request.
 
 ---
 
-## Handling a request
+## Setup (5 Minutes)
 
-1. Shopify admin > **Orders** > add a filter **Return reason** is *your reason*
-   (e.g. "Kaust custom message"), once per reason. Save each as a view (tab) so new
-   requests are one click away. Shopify's filter has no "is not empty" option.
-2. Open the order: the **Return request** field lists every request with items,
-   quantities, reasons and notes.
-3. Click **Return** (or **Refund**) on the order and process it as usual.
-4. Set **Return status** to Approved, Declined or Refunded. The customer sees it in
-   the pop-up. It goes back to Pending when they send another request.
+### Step 1: Open App Setup Page
+In Shopify Admin, open your installed app. On the **Setup & Health Check** page:
+- Click **"Set Up custom.return_reason"**. The app will automatically create and configure the `custom.return_reason` order definition with Customer Account `READ_WRITE` access, Admin filterable, and Analytics capabilities.
 
-Customers can send more requests later for items they haven't requested yet.
-The pop-up shows their earlier requests and the current status above the form.
+### Step 2: Configure Store Settings
+Complete the checklist displayed on the setup page:
+1. **Protected Customer Data**: In your [Shopify Partner Dashboard](https://partners.shopify.com), ensure Level 1 Protected Customer Data access is granted for your app (needed for Customer Account order queries).
+2. **Turn Self-Serve Returns OFF**: Go to `Settings > Customer accounts > Returns` and turn off Shopify native self-serve returns so this module manages requests.
+3. **Add the Extension Block**:
+   - Go to `Settings > Customer accounts > Customize`.
+   - On the **Orders** page, add the **"Custom return reasons"** block.
+   - Configure your return window (default 30 days), final-sale tag, fees note, and custom reasons 1 to 8.
+   - Click **Save**.
 
-## Which orders show the button
+---
 
-Paid (or partially refunded) and not cancelled, with items delivered or fulfilled
-within the return window that aren't final-sale and haven't been requested yet.
-Orders with earlier requests also show it, so the customer can see their status.
+## Extension Settings Reference
 
-## What Shopify's built-in returns do that this app can't
+Configure these in `Settings > Customer accounts > Customize`:
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| `return_window_days` | Number | `30` | Number of days after delivery/fulfillment returns are allowed. |
+| `final_sale_tag` | Text | `final-sale` | Product tag that excludes items from return eligibility. |
+| `return_fees_note` | Text | *(empty)* | Optional note shown in modal, e.g. "Return shipping fee: $5". |
+| `hide_refund_estimate` | Boolean | `false` | Set to True to hide the calculated refund estimate. |
+| `reason_1` .. `reason_8` | Text | *(default reasons)* | The return reason options available in the customer dropdown. |
 
-- Create the Shopify return automatically: Shopify blocks it while self-serve
-  returns is off, so you click Return yourself.
-- Send emails automatically: extensions can't send email. Shopify emails the
-  customer once you create the return.
-- Alert you about new requests: use the saved order view, or a Shopify Flow
-  workflow if your store offers a suitable trigger.
-- Exact refund amounts: the estimate is price minus discounts, before tax,
-  shipping and fees.
+---
+
+## Processing Returns in Admin
+1. **Filter Orders**: Filter the Order list by **Return reason** or **Return status**.
+2. **Review Request**: View the order details card to read the submitted item history and customer notes.
+3. **Update Status**: Set `Return status` to `Approved` or `Declined`.
+4. **Fulfill Return**: Click **Return items** or **Refund** directly in Shopify Admin to process inventory and payment.
+
+---
+
+## Native Shopify Analytics Report
+To view orders by return reason:
+1. Go to **Analytics > Reports > Create custom report**.
+2. Start from **Orders**.
+3. Group or breakdown by **Return reason** (`custom.return_reason`).
+
+---
+
+## Known Limitations
+- Requires **New Customer Accounts** (Customer Account UI extensions are not supported on Classic Accounts).
+- Mobile devices collapse customer account order actions into the `...` menu.
+- Shopify Admin returns and refunds are completed manually by staff.
+
+---
 
 ## Troubleshooting
 
-| Problem | Fix |
-|---|---|
-| Button doesn't appear | Check the extension is added in Customize (step 7.2), and the order is paid, fulfilled and within the return window. |
-| Error after submitting | One of the four order fields from step 6 is missing, has the wrong type, or its Customer Account API access isn't **Read and write**. The error text in the pop-up names the field. |
-| A final-sale product is still offered | The product must have the exact tag (step 7.3) and be published to the Online Store; unpublished products can't be checked. |
-| "Access denied" errors | The scopes in step 4 are missing, or protected customer data isn't approved. Deploy and accept the new permissions in Shopify admin > Apps. |
-| Shopify's "Return items" button is back | Self-serve returns was switched on again (step 7.1). |
+| Issue | Cause | Fix |
+|---|---|---|
+| Button does not appear | Order not eligible or self-serve ON | Verify order is paid, fulfilled within return window, products lack final-sale tag, and self-serve returns is OFF. |
+| "Level 1 protected customer data access is required" | Partner dashboard permission | Request Level 1 Protected Customer Data access in your Partner Dashboard for the app. |
+| "Setup page shows Missing" | Field not initialized | Click "Set Up custom.return_reason" on the App Home page. |
+
+---
+
+## License
+[MIT](LICENSE)
