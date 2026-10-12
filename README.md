@@ -1,7 +1,11 @@
 # Custom Return Reasons (Shopify App Template)
 
 > **Free, open-source, zero-backend return management for Shopify.**  
+> Created by **[Atul](https://github.com/Atul8007)**.  
 > Ask customers *why* they are returning an item, save custom reasons directly to native Order Metafields, and build native **Shopify Analytics** return reports without third-party monthly subscriptions.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Shopify CLI](https://img.shields.io/badge/Shopify%20CLI-Template-brightgreen)](https://shopify.dev/docs/apps)
 
 ---
 
@@ -28,14 +32,14 @@
 ### 1. Initialize from Template
 Create a new project using the Shopify CLI template flag:
 ```bash
-shopify app init --template https://github.com/<your-username>/custom-return-reasons
+shopify app init --template https://github.com/Atul8007/shopify-custom-return-reasons
 ```
 *(Or clone this repository directly and run `npm install`)*
 
 ### 2. Deploy the App
 Link and deploy the extensions to your app:
 ```bash
-cd custom-return-reasons
+cd shopify-custom-return-reasons
 shopify app deploy
 ```
 
@@ -105,5 +109,12 @@ To view orders by return reason:
 
 ---
 
+## Author & Maintainer
+- **Developer**: **Atul** ([@Atul8007](https://github.com/Atul8007))
+- **Repository**: [Atul8007/shopify-custom-return-reasons](https://github.com/Atul8007/shopify-custom-return-reasons)
+
+---
+
 ## License
-[MIT](LICENSE)
+[MIT](LICENSE) - Free to use, fork, and adapt for personal and commercial Shopify stores.
+
