@@ -17,36 +17,43 @@ direct_api_mode = "online"
 embedded_app_direct_api_access = true
 
 [access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_orders,write_products,customer_read_customers,customer_read_orders,customer_write_orders,customer_write_customers"
+# Access scopes:
+# - write_orders: Required for creating & updating metafield definitions on ORDER via Admin API
+# - customer_read_orders: Required for customer UI extension to query order & line item return state
+# - customer_write_orders: Required for customer UI extension to write return requests and statuses
+scopes = "write_orders,customer_read_orders,customer_write_orders"
 
 [auth]
 redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
 
-[metaobjects.app.faq]
-name = "FAQ"
-
-[metaobjects.app.faq.fields.question]
-name = "Question"
-type = "single_line_text_field"
-required = true
-
-[metaobjects.app.faq.fields.answer]
-name = "Answer"
+# App-owned order metafields (decided in Checkpoint 0)
+[order.metafields.app.return_request]
+name = "Return Request History"
+description = "Readable history of return requests submitted for this order"
 type = "multi_line_text_field"
-required = true
 
-[metaobjects.app.faq.fields.show_on_faq_page]
-name = "Show on FAQ page"
-type = "boolean"
-
-[product.metafields.app.faq]
-name = "FAQ"
-description = "FAQ for this product"
-type = "metaobject_reference<$app:faq>"
-
-  [product.metafields.app.faq.access]
+  [order.metafields.app.return_request.access]
+  customer_account = "read_write"
   admin = "merchant_read_write"
 
-[sidekick]
-extensions_summary = "Read FAQ entries stored in the app"
+[order.metafields.app.return_data]
+name = "Return Data"
+description = "Structured JSON data tracking requested items and quantities"
+type = "json"
+
+  [order.metafields.app.return_data.access]
+  customer_account = "read_write"
+  admin = "merchant_read_write"
+
+[order.metafields.app.return_status]
+name = "Return Status"
+description = "Status of the return request (Pending, Approved, Declined, Refunded)"
+type = "single_line_text_field"
+
+  [order.metafields.app.return_status.access]
+  customer_account = "read_write"
+  admin = "merchant_read_write"
+
+  [order.metafields.app.return_status.capabilities]
+  admin_filterable = true
+

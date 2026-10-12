@@ -37,12 +37,15 @@ export async function customerApi(query, variables = {}) {
 //   return_status  - single line text, preset choices Pending / Approved /
 //                    Declined / Refunded. Staff update it; the app sets
 //                    Pending on each new request. Customer Account API:
-//                    Read and write.
+// Order fields the requests are saved to.
+// Per Checkpoint 0 decisions:
+// - custom.return_reason stays merchant-owned for native Shopify Analytics and Order filters.
+// - $app:return_request, $app:return_data, and $app:return_status are app-owned TOML definitions.
 export const FIELDS = {
   reason: {namespace: 'custom', key: 'return_reason'},
-  request: {namespace: 'custom', key: 'return_request'},
-  data: {namespace: 'custom', key: 'return_data'},
-  status: {namespace: 'custom', key: 'return_status'},
+  request: {namespace: '$app', key: 'return_request'},
+  data: {namespace: '$app', key: 'return_data'},
+  status: {namespace: '$app', key: 'return_status'},
 };
 
 export const ORDER_FOR_RETURN_QUERY = `
@@ -75,8 +78,11 @@ export const ORDER_FOR_RETURN_QUERY = `
           }
         }
       }
-      returnData: metafield(namespace: "custom", key: "return_data") { value }
-      returnStatus: metafield(namespace: "custom", key: "return_status") { value }
+      # Read $app first, with fallback to legacy custom.* for backward compatibility
+      appReturnData: metafield(namespace: "$app", key: "return_data") { value }
+      legacyReturnData: metafield(namespace: "custom", key: "return_data") { value }
+      appReturnStatus: metafield(namespace: "$app", key: "return_status") { value }
+      legacyReturnStatus: metafield(namespace: "custom", key: "return_status") { value }
     }
   }
 `;
@@ -123,7 +129,9 @@ export async function productsWithTag(productIds, tag) {
 /** Previous requests saved on the order: [{at, items: [{id, name, quantity, reason, note}]}] */
 export function readRequests(order) {
   try {
-    const parsed = JSON.parse(order?.returnData?.value || '{}');
+    // Prefer app-owned return_data; fall back to legacy custom.return_data
+    const raw = order?.appReturnData?.value || order?.legacyReturnData?.value || '{}';
+    const parsed = JSON.parse(raw);
     return Array.isArray(parsed.requests) ? parsed.requests : [];
   } catch {
     return [];
@@ -149,7 +157,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  */
 export function returnableFromOrder(order, {windowDays, finalSaleIds}) {
   const requests = readRequests(order);
-  const status = order?.returnStatus?.value || '';
+  // Prefer app-owned return_status; fall back to legacy custom.return_status
+  const status = order?.appReturnStatus?.value || order?.legacyReturnStatus?.value || '';
   const none = {items: [], requests, status};
   if (!order || order.cancelledAt) return none;
   if (!PAID_STATUSES.includes(order.financialStatus)) return none;
