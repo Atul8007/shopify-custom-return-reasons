@@ -1,11 +1,12 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "11f12e75fb2382b67cd301b670d0cfb8"
-name = "custom-return-reasons"
+name = "npm-builder"
 application_url = "https://shopify.dev/apps/default-app-home"
 embedded = true
+client_id = "f54aec77baf81c08e22eb3e4dcbfd8ab"
 
 [build]
+include_config_on_deploy = true
 automatically_update_urls_on_dev = true
 
 [webhooks]
@@ -17,7 +18,7 @@ embedded_app_direct_api_access = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products,customer_read_customers,customer_read_orders,customer_write_orders,customer_write_customers"
+scopes = "write_orders,write_products,customer_read_customers,customer_read_orders,customer_write_orders,customer_write_customers"
 
 [auth]
 redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
